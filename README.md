@@ -69,8 +69,7 @@ As of right now, only Chromium-based browsers(Chrome, Brave, Edge etc.) are supp
 #### Step 2. Configuration and Usage
 
 Once you're done with the installation, it's time to start setting it all up.
-Inside ```hyprflow.sh```, you can specify the classes and the keywords in the three subsections for the 3 levels I mentioned earlier. To find out what classes your stuff has, use the ```hyprctl clients``` command while you have the windows and apps in question active. The classes are separated with a ```,``` and the keywords with a ```|```
-
+Inside ```hyprflow.sh```, you can specify the classes and the keywords in the three subsections for the 3 levels I mentioned earlier. To find out what classes your stuff has, use the ```hyprctl clients``` command while you have the windows and apps in question active. 
 Inside```hyprland.conf``` you will find examples and more detailed setup tips
 
 

@@ -1,41 +1,47 @@
 #!/usr/bin/env node
 
-const { chromium } = require('playwright');
+const { chromium } = require('playwright-core');
 
-// Get the keywords from the command-line argument
-// The Bash script will pass "YouTube|Twitter|Reddit..."
-const blockedKeywords = new RegExp(process.argv[2], 'i'); // 'i' = case-insensitive
+// Accept the specific keyword cluster passed from the Bash script
+const blockedKeywordsStr = process.argv[2];
+if (!blockedKeywordsStr) process.exit(1);
+
+const blockedKeywords = new RegExp(blockedKeywordsStr, 'i');
 const DEBUG_PORT = 9222;
 
-(async () => {
+async function run() {
   let browser;
-  try {
-    // Connect to the already-running browser
-    browser = await chromium.connectOverCDP(`http://localhost:${DEBUG_PORT}`);
-    const contexts = browser.contexts();
-    if (contexts.length === 0) {
-      console.log('No browser contexts found.');
-      return;
+  let retries = 3; 
+  while (retries > 0) {
+    try {
+      browser = await chromium.connectOverCDP(`http://localhost:${DEBUG_PORT}`);
+      break; 
+    } catch (err) {
+      retries--;
+      if (retries === 0) process.exit(1);
+      await new Promise(r => setTimeout(r, 500));
     }
+  }
 
-    // Check all pages in all contexts (e.g., main window, incognito)
-    const pages = contexts.flatMap(context => context.pages());
+  try {
+    const pages = (await browser.contexts()).flatMap(c => c.pages());
 
     for (const page of pages) {
       const title = await page.title();
       const url = page.url();
 
-      // Check if the title OR URL matches the blocked keywords
+      // Only close if it matches the specific keywords for THIS browser cluster
       if (blockedKeywords.test(title) || blockedKeywords.test(url)) {
-        console.log(`Closing tab: ${title}`);
+        console.log(`[CDP] Closing tab: ${title}`);
         await page.close();
       }
     }
   } catch (err) {
-    // Log errors, e.g., "Connection refused" if browser isn't running with the flag
-    console.error(`Error connecting to browser: ${err.message}`);
+    // Silent fail
   } finally {
-    // We don't close the browser connection, just exit the script
+    if (browser) await browser.close();
     process.exit(0);
   }
-})();
+}
+
+run();

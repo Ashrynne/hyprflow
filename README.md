@@ -53,7 +53,7 @@ In case it doesn't work for you or you just want to do everything manually:
 
 Install the packages: ```sudo pacman -S jq libnotify nodejs npm``` (if not using Arch Linux, use the appropriate command and package names for your system)
 
-Install Playwright for browser control in the same directory you cloned ```npm install playwright```
+Install Playwright for browser control in the same directory you cloned ```npm install playwright-core```
 
 Also, for browser control, you will need to make sure your browser launches in debug mode and is listening on a specific port(port numbers need to match in the launch command and inside the playwright script, use the default 9222 in most cases)
 
